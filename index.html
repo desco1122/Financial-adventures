@@ -3,32 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UTRGV Financial Adventures</title>
+    <title>Financial Adventures</title>
     
-    <!-- External Libraries -->
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* --- Base Styles --- */
-        body { font-family: 'Inter', sans-serif; background-color: #f0f9ff; }
+        /* styles */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-image: url(img.png);
+            background-color: #f0f9ff; /* Fallback color */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            
+        }
         .font-display { font-family: 'Fredoka One', cursive; }
 
-        /* --- Components --- */
+        /* components */
         .nav-link { transition: transform 0.2s ease, color 0.2s ease; }
         .nav-link:hover { transform: translateY(-2px); color: #f97316; }
         .card { border-radius: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; }
         .card:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15), 0 10px 10px -5px rgba(0,0,0,0.1); }
-        .gemini-button { background: linear-gradient(45deg, #3b82f6, #8b5cf6); }
+        
+        /* frosted glass effect */
+        .frosted-glass {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            border-radius: 1.5rem; /* 24px */
+            border: 5px solid rgba(255, 255, 255, 0.3);
+        }
 
-        /* --- Modal --- */
+        /* modal */
         #modal { transition: opacity 0.3s ease, transform 0.3s ease; }
         .modal-hidden { opacity: 0; transform: scale(0.95); pointer-events: none; }
         .modal-visible { opacity: 1; transform: scale(1); pointer-events: auto; }
+        
+        /* glow */
+        .modal-glow {
+            animation: glow 1s ease-in-out;
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px 5px rgba(59, 130, 246, 0); }
+            50% { box-shadow: 0 0 40px 20px rgba(59, 130, 246, 0.7); }
+            100% { box-shadow: 0 0 10px 5px rgba(59, 130, 246, 0); }
+        }
 
-        /* --- Games --- */
+        /* Games */
         .game-item { cursor: grab; }
         .drop-zone.drag-over { border-style: dashed; background-color: #f0fdf4; }
         .cash-grab-item { position: absolute; font-size: 2rem; animation: fall 3s linear forwards; cursor: pointer; }
@@ -42,15 +69,16 @@
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center gap-3">
-                    <div class="text-4xl">🤠</div>
-                    <div class="font-display text-xl md:text-2xl text-orange-600">UTRGV Financial Adventures</div>
+                    <div class="text-4xl">💰</div>
+                    <div class="font-display text-xl md:text-2xl text-orange-600">Financial Adventures</div>
                 </div>
                 <div class="hidden md:flex items-center space-x-1">
-                    <a href="#" data-view="home-view" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                    <a href="#" data-view="games-view" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Games</a>
-                    <a href="#" data-view="videos-view" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Videos</a>
-                    <a href="#" data-view="photos-view" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Photos</a>
-                    <a href="#" id="about-link" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
+                    <a href="#" data-view="home" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="#" data-view="games" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Games</a>
+                    <a href="#" data-view="videos" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Videos</a>
+                    <a href="#" data-view="photos" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Photos</a>
+                    <a href="#" data-view="resources" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Resources</a>
+                    <a href="#" data-action="about" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
                 </div>
                 <div class="md:hidden">
                     <button id="mobile-menu-button" class="text-gray-600 focus:outline-none"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg></button>
@@ -58,75 +86,93 @@
             </div>
         </div>
         <div id="mobile-menu" class="md:hidden hidden">
-            <a href="#" data-view="home-view" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Home</a>
-            <a href="#" data-view="games-view" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Games</a>
-            <a href="#" data-view="videos-view" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Videos</a>
-            <a href="#" data-view="photos-view" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Photos</a>
-            <a href="#" id="mobile-about-link" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">About</a>
+            <a href="#" data-view="home" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Home</a>
+            <a href="#" data-view="games" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Games</a>
+            <a href="#" data-view="videos" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Videos</a>
+            <a href="#" data-view="photos" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Photos</a>
+            <a href="#" data-view="resources" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">Resources</a>
+            <a href="#" data-action="about" class="block text-gray-600 hover:bg-gray-100 px-4 py-2">About</a>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
+    <!-- Main content area -->
     <main class="container mx-auto px-4 py-8 md:py-12">
         <div id="home-view" class="view">
-            <header class="text-center mb-12"><h1 class="font-display text-4xl md:text-6xl text-red-400">Start Your Adventure</h1><p class="mt-2 text-lg md:text-xl text-gray-600">Select a school level to begin learning!</p></header>
+            <header class="text-center mb-12"><h1 class="font-display text-4xl md:text-6xl text-red-500">Start Your Adventure</h1><p class="mt-2 text-lg md:text-xl text-gray-600">Select a school level to begin learning!</p></header>
             <div class="grid md:grid-cols-3 gap-8 mb-16">
-                <div id="select-elementary" class="card bg-green-400 text-white p-8 text-center"><div class="text-6xl mb-4">🎒</div><h2 class="font-display text-3xl">Elementary School</h2><p>Grades K-5</p></div>
-                <div id="select-middle" class="card bg-blue-400 text-white p-8 text-center"><div class="text-6xl mb-4">📚</div><h2 class="font-display text-3xl">Middle School</h2><p>Grades 6-8</p></div>
-                <div id="select-high" class="card bg-purple-400 text-white p-8 text-center"><div class="text-6xl mb-4">🧑‍🎓</div><h2 class="font-display text-3xl">High School</h2><p>Grades 9-12</p></div>
+                <div data-level="elementary" class="card frosted-glass bg-yellow-400 p-8 text-center text-white"><div class="text-6xl mb-4">🎒</div><h2 class="font-display text-3xl">Elementary School</h2><p>Grades K-5</p></div>
+                <div data-level="middle" class="card frosted-glass bg-blue-400 p-8 text-center text-white"><div class="text-6xl mb-4">📚</div><h2 class="font-display text-3xl">Middle School</h2><p>Grades 6-8</p></div>
+                <div data-level="high" class="card frosted-glass bg-purple-400 p-8 text-center text-white"><div class="text-6xl mb-4">🧑‍🎓</div><h2 class="font-display text-3xl">High School</h2><p>Grades 9-12</p></div>
             </div>
-            <section class="bg-white p-6 rounded-2xl shadow-lg"><h2 class="font-display text-3xl text-center text-blue-500 mb-4">✨ Ask a Financial Question!</h2><div class="flex flex-col sm:flex-row gap-2 max-w-xl mx-auto"><input type="text" id="financial-question-input" placeholder="e.g., Why is saving money important?" class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"><button id="ask-gemini-btn" class="gemini-button text-white font-bold px-6 py-2 rounded-lg w-full sm:w-auto">Ask Gemini</button></div></section>
+             <footer class="mt-16 pt-1 text-center frosted-glass">
+                <h2 class="font-display text-3xl text-gray-700">Our Mission</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-gray-800 font-semibold">
+                    To empower students of all ages with the knowledge and skills to make smart financial decisions, fostering a future of economic well-being and confidence.
+                </p>
+            </footer>
         </div>
         <div id="topics-view" class="view hidden"></div>
         <div id="games-view" class="view hidden"></div>
         <div id="videos-view" class="view hidden"></div>
         <div id="photos-view" class="view hidden"></div>
+        <div id="resources-view" class="view hidden"></div>
     </main>
 
     <!-- Modal -->
     <div id="modal" class="modal-hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60"></div>
         <div id="modal-container" class="relative bg-white w-full rounded-2xl shadow-2xl overflow-hidden mx-4">
-            <div class="p-6 md:p-8"><button id="modal-close" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition z-10"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div id="modal-body-content"></div></div>
+            <div class="p-6 md:p-8"><button data-action="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition z-10"><svg class="w-8 h-8 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button><div id="modal-body-content"></div></div>
         </div>
     </div>
 
     <script>
-        // --- DATA STORE ---
+        // data store
         const AppData = {
             topics: {
-                elementary: { title: 'Elementary School', subtitle: 'Grades K-5: The Building Blocks of Money', color: 'text-green-500', items: [ { id: 'what-is-money', title: 'What is Money?', icon: '💰', description: 'Money is what we use to buy things we need and want. It comes in the form of coins and paper bills, or it can be digital in a bank account.', example: 'Using a dollar bill to buy an apple at the store.' }, { id: 'saving-spending', title: 'Saving & Spending', icon: '🐷', description: 'Spending is using money to buy things now. Saving is putting money aside to buy bigger things later.', example: 'Instead of buying a toy today (spending), you put your allowance in a piggy bank to save for a new bike.' }, { id: 'needs-wants', title: 'Needs vs. Wants', icon: '🛍️', description: 'Needs are things you must have to live, like food, water, and a home. Wants are things you would like to have, but don\'t need to survive, like toys and video games.', example: 'A warm coat for winter is a need. A new video game is a want.' }, { id: 'earning', title: 'Earning Money', icon: '🧹', description: 'Earning means you get money for doing work. This can be from doing chores, helping a neighbor, or having a job when you\'re older.', example: 'Getting your weekly allowance for cleaning your room.' } ] },
+                elementary: { title: 'Elementary School', subtitle: 'Grades K-5: The Building Blocks of Money', color: 'text-red-400', items: [ { id: 'what-is-money', title: 'What is Money?', icon: '💰', description: 'Money is what we use to buy things we need and want. It comes in the form of coins and paper bills, or it can be digital in a bank account.', example: 'Using a dollar bill to buy an apple at the store.' }, { id: 'saving-spending', title: 'Saving & Spending', icon: '🐷', description: 'Spending is using money to buy things now. Saving is putting money aside to buy bigger things later.', example: 'Instead of buying a toy today (spending), you put your allowance in a piggy bank to save for a new bike.' }, { id: 'needs-wants', title: 'Needs vs. Wants', icon: '🛍️', description: 'Needs are things you must have to live, like food, water, and a home. Wants are things you would like to have, but don\'t need to survive, like toys and video games.', example: 'A warm coat for winter is a need. A new video game is a want.' }, { id: 'earning', title: 'Earning Money', icon: '🧹', description: 'Earning means you get money for doing work. This can be from doing chores, helping a neighbor, or having a job when you\'re older.', example: 'Getting your weekly allowance for cleaning your room.' } ] },
                 middle: { title: 'Middle School', subtitle: 'Grades 6-8: Making Smarter Money Choices', color: 'text-blue-500', items: [ { id: 'budgeting', title: 'Budgeting Basics', icon: '📊', description: 'A budget is a plan for your money. It helps you see how much money you have coming in (income) and how much is going out (expenses).', example: 'Creating a plan to spend your $20 monthly allowance on snacks, a movie ticket, and saving the rest.' }, { id: 'banking', title: 'Banks & Credit Unions', icon: '🏦', description: 'Banks and credit unions are safe places to keep your money. They offer services like savings accounts, checking accounts, and debit cards.', example: 'Opening a savings account at a local bank to keep your birthday money safe.' }, { id: 'intro-credit', title: 'Intro to Credit', icon: '💳', description: 'Credit is borrowing money that you promise to pay back later. Using credit responsibly is important for your financial future.', example: 'Your parents use a credit card to buy groceries and then pay the full bill at the end of the month.' }, { id: 'compound-interest', title: 'Compound Interest', icon: '✨', description: 'This is "interest on your interest." It means your saved money earns interest, and then that new, larger amount of money also earns interest, helping your savings grow faster!', example: 'If you have $100 that earns 5% interest, you get $5. Next year, you earn interest on $105, not just $100.' } ] },
                 high: { title: 'High School', subtitle: 'Grades 9-12: Preparing for Financial Independence', color: 'text-purple-500', items: [ { id: 'building-credit', title: 'Building Credit', icon: '📈', description: 'A good credit score shows you can be trusted to pay back money. It\'s important for getting loans for a car or house, or even for renting an apartment.', example: 'Getting a student credit card, using it for small purchases, and paying the bill in full every month.' }, { id: 'investing', title: 'Investing 101', icon: '💹', description: 'Investing is using money to try to make more money. Common ways to invest are buying stocks (small pieces of a company) or bonds (loaning money to a government or company).', example: 'Buying a few shares of a company you believe in and holding them to hopefully grow in value over time.' }, { id: 'student-loans', title: 'Student Loans', icon: '🎓', description: 'These are loans to help pay for college or trade school. It\'s important to understand the interest rates and repayment plans before borrowing.', example: 'Researching the difference between federal and private student loans to choose the best option for your education.' }, { id: 'taxes', title: 'Taxes & Paychecks', icon: '🧾', description: 'When you earn money from a job, a portion is taken out for taxes to pay for public services like roads and schools. Your take-home pay is what\'s left after taxes.', example: 'Looking at your first paystub to see the difference between your gross pay (total earned) and net pay (what you take home).' } ] }
             }
         };
 
-        // --- DOM ELEMENTS ---
+        // dom elements
         const Views = {
             home: document.getElementById('home-view'),
             topics: document.getElementById('topics-view'),
             games: document.getElementById('games-view'),
             videos: document.getElementById('videos-view'),
             photos: document.getElementById('photos-view'),
+            resources: document.getElementById('resources-view'),
         };
         const Modal = {
             el: document.getElementById('modal'),
             container: document.getElementById('modal-container'),
             backdrop: document.getElementById('modal-backdrop'),
-            closeBtn: document.getElementById('modal-close'),
             content: document.getElementById('modal-body-content'),
         };
 
-        // --- UTILITY FUNCTIONS ---
+        // utlilty functions
         const showView = (viewId) => {
             Object.values(Views).forEach(view => view.classList.add('hidden'));
             Views[viewId.replace('-view', '')].classList.remove('hidden');
         };
         const showModal = (content, size = 'lg') => {
-            Modal.container.className = `relative bg-white w-full max-w-${size} rounded-2xl shadow-2xl overflow-hidden mx-4`;
+            const rainbowColors = [ '255, 0, 0', '255, 165, 0', '255, 255, 0', '0, 128, 0', '0, 0, 255', '75, 0, 130', '238, 130, 238' ];
+            const randomColor = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
+            const oldGlowStyle = document.getElementById('glow-style');
+            if (oldGlowStyle) oldGlowStyle.remove();
+            
+            const newGlowStyle = document.createElement('style');
+            newGlowStyle.id = 'glow-style';
+            newGlowStyle.innerHTML = `@keyframes glow { 0% { box-shadow: 0 0 10px 5px rgba(${randomColor}, 0); } 50% { box-shadow: 0 0 40px 20px rgba(${randomColor}, 0.7); } 100% { box-shadow: 0 0 10px 5px rgba(${randomColor}, 0); } }`;
+            document.head.appendChild(newGlowStyle);
+
+            Modal.container.className = `relative bg-white w-full max-w-${size} rounded-2xl shadow-2xl overflow-hidden mx-4 modal-glow`;
             Modal.content.innerHTML = content;
             Modal.el.classList.remove('modal-hidden');
             Modal.el.classList.add('modal-visible');
+            setTimeout(() => Modal.container.classList.remove('modal-glow'), 1000);
         };
         const hideModal = () => {
             Modal.el.classList.add('modal-hidden');
@@ -134,13 +180,14 @@
         };
         const playSound = () => { try { new Tone.Synth().toDestination().triggerAttackRelease("C4", "8n"); } catch(e) { console.error("Tone.js error", e); } };
         const triggerConfetti = () => { if (typeof confetti === 'function') { confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); } };
-
-        // --- PAGE RENDERING ---
+        
+        // page rendering
         const renderStaticViews = () => {
             Views.games.innerHTML = `<header class="text-center mb-12"><h1 class="font-display text-4xl md:text-5xl text-orange-500">Play & Learn</h1><p class="mt-2 text-lg md:text-xl text-gray-600">Test your skills with these fun games!</p></header><main class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8"><div data-game="needs-wants" class="card bg-rose-400 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">🛒</div><h2 class="font-display text-2xl md:text-3xl">Needs vs. Wants</h2></div><div data-game="coin-counter" class="card bg-teal-400 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">🪙</div><h2 class="font-display text-2xl md:text-3xl">Coin Counter</h2></div><div data-game="budget-builder" class="card bg-amber-400 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">📝</div><h2 class="font-display text-2xl md:text-3xl">Budget Builder</h2></div><div data-game="investment-growth" class="card bg-indigo-400 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">📈</div><h2 class="font-display text-2xl md:text-3xl">Investment Growth</h2></div><div data-game="smart-shopper" class="card bg-cyan-400 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">🛍️</div><h2 class="font-display text-2xl md:text-3xl">Smart Shopper</h2></div><div data-game="paycheck-puzzle" class="card bg-lime-500 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">💼</div><h2 class="font-display text-2xl md:text-3xl">Paycheck Puzzle</h2></div><div data-game="piggy-bank" class="card bg-pink-400 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">🐷</div><h2 class="font-display text-2xl md:text-3xl">Piggy Bank</h2></div><div data-game="cash-grab" class="card bg-green-500 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">💸</div><h2 class="font-display text-2xl md:text-3xl">Cash Grab</h2></div><div data-game="credit-climber" class="card bg-gray-600 text-white p-6 md:p-8 text-center"><div class="text-5xl md:text-6xl mb-4">🧗</div><h2 class="font-display text-2xl md:text-3xl">Credit Climber</h2></div></main>`;
             Views.videos.innerHTML = `<header class="text-center mb-12"><h1 class="font-display text-4xl md:text-6xl text-orange-500">Videos</h1><p class="mt-2 text-lg md:text-xl text-gray-600">Watch and learn about money!</p></header><main class="grid md:grid-cols-2 gap-8"><div class="aspect-w-16 aspect-h-9"><iframe class="w-full h-full rounded-lg shadow-lg" src="https://www.youtube.com/embed/fdvyZdWnK_Q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><div class="aspect-w-16 aspect-h-9"><iframe class="w-full h-full rounded-lg shadow-lg" src="https://www.youtube.com/embed/i_g-yw1n_P8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><div class="aspect-w-16 aspect-h-9"><iframe class="w-full h-full rounded-lg shadow-lg" src="https://www.youtube.com/embed/SE4-2sW_o5w" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div><div class="aspect-w-16 aspect-h-9"><iframe class="w-full h-full rounded-lg shadow-lg" src="https://www.youtube.com/embed/J2p_D2gN9sU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></main>`;
-            Views.photos.innerHTML = `<header class="text-center mb-12"><h1 class="font-display text-4xl md:text-6xl text-orange-500">Photos</h1><p class="mt-2 text-lg md:text-xl text-gray-600">A gallery of financial moments.</p></header><main class="grid grid-cols-2 md:grid-cols-3 gap-4"><img src="https://placehold.co/600x400/34D399/ffffff?text=Saving+Money" alt="Saving Money" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/FBBF24/ffffff?text=Student+Budgeting" alt="Student Budgeting" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/60A5FA/ffffff?text=First+Paycheck" alt="First Paycheck" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/A78BFA/ffffff?text=Learning+to+Invest" alt="Learning to Invest" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/F472B6/ffffff?text=Financial+Goals" alt="Financial Goals" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/FB923C/ffffff?text=Community+Bank" alt="Community Bank" class="rounded-lg shadow-lg w-full h-full object-cover"></main>`;
+            Views.photos.innerHTML = `<header class="text-center mb-12"><h1 class="font-display text-4xl md:text-6xl text-orange-500">Photos</h1><p class="mt-2 text-lg md:text-xl text-gray-600">A gallery of financial moments.</p></header><main class="grid grid-cols-2 md:grid-cols-3 gap-4"><img src="https://placehold.co/600x400/34D399/ffffff?text=Pic1" alt="Saving Money" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/FBBF24/ffffff?text=Pic2" alt="Student Budgeting" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/60A5FA/ffffff?text=Pic3" alt="First Paycheck" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/A78BFA/ffffff?text=Pic4" alt="Learning to Invest" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/F472B6/ffffff?text=Pic5" alt="Financial Goals" class="rounded-lg shadow-lg w-full h-full object-cover"><img src="https://placehold.co/600x400/FB923C/ffffff?text=Pic6" alt="Community Bank" class="rounded-lg shadow-lg w-full h-full object-cover"></main>`;
             Views.topics.innerHTML = `<header class="text-center mb-12"><h1 id="topics-title" class="font-display text-4xl md:text-6xl"></h1><p id="topics-subtitle" class="mt-2 text-lg md:text-xl"></p></header><main id="topics-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8"></main>`;
+            Views.resources.innerHTML = `<header class="text-center mb-12"><h1 class="font-display text-4xl md:text-6xl text-orange-500">Resources</h1><p class="mt-2 text-lg md:text-xl text-gray-600">Helpful links and documents for your financial journey.</p></header><main class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg"><section><h2 class="font-display text-3xl text-blue-500 border-b-2 pb-2 mb-4">Website Links</h2><div class="space-y-4"><!-- USER: Paste your website links here --><!-- Example: --><div class="p-4 bg-gray-50 rounded-lg"><a href="https://www.consumerfinance.gov/consumer-tools/money-as-you-grow/" target="_blank" class="font-bold text-lg text-blue-600 hover:underline">Money as You Grow</a><p class="text-gray-600">An interactive tool from the Consumer Financial Protection Bureau to help kids learn about money.</p></div><div class="p-4 bg-gray-50 rounded-lg"><a href="https://pbskids.org/cyberchase/topics/money" target="_blank" class="font-bold text-lg text-blue-600 hover:underline">PBS Cyberchase</a><p class="text-gray-600">Helpful money resources for kids provided by PBS.</p></div></div></section><section class="mt-12"><h2 class="font-display text-3xl text-green-500 border-b-2 pb-2 mb-4">PDF Downloads</h2><div class="space-y-4"><div class="p-4 bg-gray-50 rounded-lg flex items-center justify-between"><div><h3 class="font-bold text-lg text-green-600">My First Budget Worksheet.pdf</h3><p class="text-gray-600">A printable worksheet for elementary students.</p></div><a href="https://dfi.wa.gov/sites/default/files/budgeting-student-worksheet.pdf" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Download</a></div><div class="p-4 bg-gray-50 rounded-lg flex items-center justify-between"><div><h3 class="font-bold text-lg text-green-600">PDF file 2.pdf</h3><p class="text-gray-600">description.</p></div><a href="#" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Download</a></div></div></section></main>`;
         };
         const displayTopics = (level) => {
             const data = AppData.topics[level];
@@ -156,26 +203,11 @@
             showView('topics-view');
         };
 
-        // --- GEMINI API ---
-        const callGemini = async (prompt) => {
-            const apiKey = "AIzaSyC8obuQ4o31uwImBBaHfyE-1vdRflt3wTw"; //Google Cloud Key
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                const result = await response.json();
-                return result.candidates[0].content.parts[0].text;
-            } catch (error) {
-                console.error("Gemini API Error:", error);
-                return "An error occurred. If running locally, please ensure you have a valid Gemini API key.";
-            }
-        };
-
-        // --- EVENT HANDLERS ---
+        // event handlers
         const AppEvents = {
             handleNavClick: (e) => {
                 e.preventDefault();
-                const view = e.target.dataset.view;
+                const view = e.target.closest('[data-view]')?.dataset.view;
                 if (view) showView(view);
                 document.getElementById('mobile-menu').classList.add('hidden');
             },
@@ -184,16 +216,6 @@
                 const content = `<div class="flex-1 text-center"><h2 class="font-display text-3xl text-orange-500 mb-4">About UTRGV Financial Adventures</h2><p class="text-gray-600 mb-4">Welcome! Our mission is to make learning about money simple, fun, and engaging for all ages.</p><p class="text-gray-600">This interactive page was built with a passion for education and technology. We hope you enjoy your journey to financial fitness!</p></div>`;
                 showModal(content, '2xl');
                 document.getElementById('mobile-menu').classList.add('hidden');
-            },
-            handleAskGemini: async () => {
-                const input = document.getElementById('financial-question-input');
-                if (!input.value.trim()) return;
-                const question = input.value.trim();
-                const prompt = `Explain the answer to this financial question for a child in a simple, friendly, and encouraging way. Question: "${question}"`;
-                showModal(`<div class="text-center p-8"><p class="text-lg">Asking Gemini... ✨</p></div>`, '2xl');
-                const answer = await callGemini(prompt);
-                const answerContent = `<div class="flex-1"><h2 class="font-display text-2xl text-orange-500 mb-2">Your Question:</h2><p class="text-gray-600 mb-4 italic">"${question}"</p><h2 class="font-display text-2xl text-orange-500 mb-2">✨ Gemini's Answer:</h2><p class="text-gray-700 whitespace-pre-wrap">${answer}</p></div>`;
-                showModal(answerContent, '2xl');
             },
             handleTopicClick: (e) => {
                 const card = e.target.closest('.topic-card');
@@ -216,7 +238,7 @@
             }
         };
 
-        // --- GAME LAUNCHER ---
+        // game launcher
         const GameLauncher = {
             init(gameId) {
                 playSound();
@@ -227,7 +249,7 @@
             getGameHTML: (id) => ({
                 'needs-wants': `<h2 class="font-display text-3xl text-center text-orange-500 mb-4">Needs vs. Wants Sort</h2><div id="game-feedback" class="text-center mb-4 h-6"></div><div id="items-to-sort" class="flex flex-wrap justify-center gap-2 mb-4 min-h-[50px]"></div><div class="grid grid-cols-2 gap-4"><div id="needs-box" class="drop-zone bg-green-100 p-4 rounded-lg border-2 border-green-300 min-h-[100px]"><h3 class="font-bold text-center text-green-800">Needs ✅</h3></div><div id="wants-box" class="drop-zone bg-red-100 p-4 rounded-lg border-2 border-red-300 min-h-[100px]"><h3 class="font-bold text-center text-red-800">Wants 🛍️</h3></div></div><button id="reset-game" class="mt-4 mx-auto block bg-orange-500 text-white px-4 py-2 rounded-lg">Play Again</button>`,
                 'coin-counter': `<h2 class="font-display text-3xl text-center text-orange-500 mb-2">Coin Counter</h2><p class="text-center text-gray-600 mb-4">Click coins to match the target!</p><div class="bg-gray-100 p-4 rounded-lg text-center"><p>Target:</p><p id="coin-target" class="font-bold text-4xl text-teal-600"></p></div><div class="text-center my-4"><p>Your Total:</p><p id="coin-current-total" class="font-bold text-4xl text-gray-800">$0.00</p></div><div id="coin-buttons" class="flex justify-center gap-2 md:gap-4 mb-4"></div><div id="game-feedback" class="text-center mb-4 h-6 font-bold"></div><button id="reset-game" class="mt-4 mx-auto block bg-orange-500 text-white px-4 py-2 rounded-lg">New Target</button>`,
-                'budget-builder': `<h2 class="font-display text-3xl text-center text-orange-500 mb-4">Budget Builder</h2><div class="bg-blue-100 p-4 rounded-lg mb-4"><div class="flex justify-between items-center"><p class="font-bold">Weekly Allowance:</p><p id="allowance-amount" class="font-bold text-2xl"></p></div><div class="flex justify-between items-center mt-2"><p class="font-bold">Money Left:</p><p id="budget-remaining" class="font-bold text-2xl"></p></div></div><div id="budget-categories" class="space-y-3"></div><div id="game-feedback" class="text-center mt-4 h-6 font-bold"></div><button id="get-budget-tips" class="gemini-button mt-4 mx-auto block text-white px-4 py-2 rounded-lg">Get Tips ✨</button><div id="budget-tips-output" class="mt-4 p-3 bg-purple-50 rounded-lg hidden"></div>`,
+                'budget-builder': `<h2 class="font-display text-3xl text-center text-orange-500 mb-4">Budget Builder</h2><div class="bg-blue-100 p-4 rounded-lg mb-4"><div class="flex justify-between items-center"><p class="font-bold">Weekly Allowance:</p><p id="allowance-amount" class="font-bold text-2xl"></p></div><div class="flex justify-between items-center mt-2"><p class="font-bold">Money Left:</p><p id="budget-remaining" class="font-bold text-2xl"></p></div></div><div id="budget-categories" class="space-y-3"></div><div id="game-feedback" class="text-center mt-4 h-6 font-bold"></div>`,
                 'investment-growth': `<h2 class="font-display text-3xl text-center text-orange-500 mb-4">Investment Growth</h2><div class="text-center mb-4"><p class="font-bold">Initial Investment: $</p><input type="number" id="initial-investment" value="100" class="w-24 p-1 rounded border text-center font-bold"><div class="my-2"><label for="risk-level" class="font-bold">Risk Level: </label><select id="risk-level" class="p-1 rounded border"><option value="0.04">Low (4%)</option><option value="0.07" selected>Medium (7%)</option><option value="0.10">High (10%)</option></select></div></div><div class="grid grid-cols-2 gap-4 text-center"><div><p class="font-bold">Year</p><p id="invest-year" class="text-3xl">0</p></div><div><p class="font-bold">Value</p><p id="invest-value" class="text-3xl text-indigo-600">$100.00</p></div></div><button id="next-year-btn" class="mt-6 mx-auto block bg-indigo-500 text-white px-6 py-2 rounded-lg">Next Year</button><button id="reset-game" class="mt-2 mx-auto block bg-gray-400 text-white px-4 py-1 rounded-lg text-sm">Reset</button>`,
                 'smart-shopper': `<h2 class="font-display text-3xl text-center text-orange-500 mb-4">Smart Shopper</h2><p class="text-center text-gray-600 mb-4">Which is the better deal?</p><div id="shopper-items" class="grid grid-cols-2 gap-4"></div><div id="game-feedback" class="text-center mt-4 h-6 font-bold"></div><button id="reset-game" class="mt-4 mx-auto block bg-orange-500 text-white px-4 py-2 rounded-lg">Next Pair</button>`,
                 'paycheck-puzzle': `<h2 class="font-display text-3xl text-center text-orange-500 mb-4">Paycheck Puzzle</h2><div class="bg-gray-100 p-4 rounded-lg mb-4"><div class="flex justify-between items-center"><p class="font-bold">Gross Pay:</p><p id="gross-pay" class="font-bold text-2xl"></p></div></div><div id="paycheck-deductions" class="space-y-2"></div><hr class="my-3 border-t-2"/><div class="flex justify-between items-center"><p class="font-bold">Net Pay (Guess):</p><div class="flex items-center gap-1"><span>$</span><input type="number" id="net-pay-guess" class="w-28 p-1 rounded border text-right"></div></div><button id="check-guess-btn" class="mt-4 mx-auto block bg-lime-600 text-white px-4 py-2 rounded-lg">Check</button><div id="game-feedback" class="text-center mt-4 h-6 font-bold"></div><button id="reset-game" class="mt-2 mx-auto block bg-gray-400 text-white px-4 py-1 rounded-lg text-sm hidden">New Puzzle</button>`,
@@ -236,49 +258,63 @@
                 'credit-climber': `<h2 class="font-display text-3xl text-center text-orange-500 mb-2">Credit Climber</h2><div class="text-center font-bold text-lg mb-2">Credit Score: <span id="credit-score" class="text-2xl text-blue-600">650</span></div><div class="bg-gray-100 p-4 rounded-lg min-h-[100px] mb-4"><p id="credit-scenario-text"></p></div><div id="credit-choices" class="grid grid-cols-1 gap-2"></div><div id="game-feedback" class="text-center mt-4 h-6 font-bold"></div>`,
             })[id],
             getGameLogic: (id) => ({
-                'needs-wants': () => { const items = [ { id: 'item1', name: 'Video Game', type: 'want' }, { id: 'item2', name: 'Apple', type: 'need' }, { id: 'item3', name: 'Water', type: 'need' }, { id: 'item4', name: 'New Toy', type: 'want' }, { id: 'item5', name: 'Winter Coat', type: 'need' }, { id: 'item6', name: 'Candy Bar', type: 'want' } ].sort(() => Math.random() - 0.5); const itemsContainer = document.getElementById('items-to-sort'), needsBox = document.getElementById('needs-box'), wantsBox = document.getElementById('wants-box'), feedback = document.getElementById('game-feedback'); itemsContainer.innerHTML = ''; needsBox.innerHTML = '<h3 class="font-bold text-center text-green-800">Needs ✅</h3>'; wantsBox.innerHTML = '<h3 class="font-bold text-center text-red-800">Wants 🛍️</h3>'; feedback.textContent = ''; items.forEach(item => { const button = document.createElement('div'); button.id = item.id; button.textContent = item.name; button.dataset.type = item.type; button.draggable = true; button.className = 'game-item bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg'; button.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', e.target.id)); itemsContainer.appendChild(button); }); const dropZones = [needsBox, wantsBox]; dropZones.forEach(zone => { zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); }); zone.addEventListener('dragleave', () => zone.classList.remove('drag-over')); zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); const id = e.dataTransfer.getData('text'); const draggableElement = document.getElementById(id); const droppedInCorrectBox = (zone.id === 'needs-box' && draggableElement.dataset.type === 'need') || (zone.id === 'wants-box' && draggableElement.dataset.type === 'want'); if (droppedInCorrectBox) { draggableElement.className = `game-item ${draggableElement.dataset.type === 'need' ? 'bg-green-200' : 'bg-red-200'} px-3 py-2 rounded-lg m-1`; zone.appendChild(draggableElement); feedback.textContent = 'Correct!'; feedback.className = 'text-center mb-4 h-6 font-bold text-green-600'; } else { feedback.textContent = 'Not quite, try again!'; feedback.className = 'text-center mb-4 h-6 font-bold text-red-600'; } if (itemsContainer.childElementCount === 0) { feedback.textContent = 'All sorted! Great job!'; triggerConfetti(); } }); }); document.getElementById('reset-game').onclick = this.getGameLogic('needs-wants'); },
+                'needs-wants': () => { const items = [ { id: 'item1', name: 'Video Game', type: 'want' }, { id: 'item2', name: 'Apple', type: 'need' }, { id: 'item3', name: 'Water', type: 'need' }, { id: 'item4', name: 'New Toy', type: 'want' }, { id: 'item5', name: 'Winter Coat', type: 'need' }, { id: 'item6', name: 'Candy Bar', type: 'want' } ].sort(() => Math.random() - 0.5); const itemsContainer = document.getElementById('items-to-sort'), needsBox = document.getElementById('needs-box'), wantsBox = document.getElementById('wants-box'), feedback = document.getElementById('game-feedback'); itemsContainer.innerHTML = ''; needsBox.innerHTML = '<h3 class="font-bold text-center text-green-800">Needs ✅</h3>'; wantsBox.innerHTML = '<h3 class="font-bold text-center text-red-800">Wants 🛍️</h3>'; feedback.textContent = ''; items.forEach(item => { const button = document.createElement('div'); button.id = item.id; button.textContent = item.name; button.dataset.type = item.type; button.draggable = true; button.className = 'game-item bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg'; button.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', e.target.id)); itemsContainer.appendChild(button); }); const dropZones = [needsBox, wantsBox]; dropZones.forEach(zone => { zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); }); zone.addEventListener('dragleave', () => zone.classList.remove('drag-over')); zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); const id = e.dataTransfer.getData('text'); const draggableElement = document.getElementById(id); const droppedInCorrectBox = (zone.id === 'needs-box' && draggableElement.dataset.type === 'need') || (zone.id === 'wants-box' && draggableElement.dataset.type === 'want'); if (droppedInCorrectBox) { draggableElement.className = `game-item ${draggableElement.dataset.type === 'need' ? 'bg-green-200' : 'bg-red-200'} px-3 py-2 rounded-lg m-1`; zone.appendChild(draggableElement); feedback.textContent = 'Correct!'; feedback.className = 'text-center mb-4 h-6 font-bold text-green-600'; } else { feedback.textContent = 'Not quite, try again!'; feedback.className = 'text-center mb-4 h-6 font-bold text-red-600'; } if (itemsContainer.childElementCount === 0) { feedback.textContent = 'All sorted! Great job!'; triggerConfetti(); } }); }); document.getElementById('reset-game').onclick = GameLauncher.getGameLogic('needs-wants'); },
                 'coin-counter': () => { const coins = [ { value: 0.01, symbol: '1¢' }, { value: 0.05, symbol: '5¢' }, { value: 0.10, symbol: '10¢' }, { value: 0.25, symbol: '25¢' } ]; let target = 0, currentTotal = 0; const targetEl = document.getElementById('coin-target'), currentTotalEl = document.getElementById('coin-current-total'), buttonsEl = document.getElementById('coin-buttons'), feedbackEl = document.getElementById('game-feedback'); function startNewRound() { currentTotal = 0; target = (Math.floor(Math.random() * 199) + 1) / 100; targetEl.textContent = `$${target.toFixed(2)}`; updateDisplay(); feedbackEl.textContent = ''; } function updateDisplay() { currentTotalEl.textContent = `$${currentTotal.toFixed(2)}`; if (Math.abs(currentTotal - target) < 0.001) { feedbackEl.textContent = 'You got it! 🎉'; feedbackEl.className = 'text-center mb-4 h-6 font-bold text-green-600'; triggerConfetti(); } else if (currentTotal > target) { feedbackEl.textContent = 'Oops, too much!'; feedbackEl.className = 'text-center mb-4 h-6 font-bold text-red-600'; } else { feedbackEl.textContent = ''; } } buttonsEl.innerHTML = ''; coins.forEach(coin => { const button = document.createElement('button'); button.textContent = coin.symbol; button.className = 'bg-yellow-400 hover:bg-yellow-500 text-yellow-800 font-bold w-12 h-12 rounded-full'; button.onclick = () => { currentTotal += coin.value; updateDisplay(); }; buttonsEl.appendChild(button); }); document.getElementById('reset-game').onclick = startNewRound; startNewRound(); },
-                'budget-builder': () => { const totalAllowance = Math.floor(Math.random() * 91) + 10; let remaining = totalAllowance; const allowanceEl = document.getElementById('allowance-amount'), categoriesEl = document.getElementById('budget-categories'), remainingEl = document.getElementById('budget-remaining'), feedbackEl = document.getElementById('game-feedback'), tipsBtn = document.getElementById('get-budget-tips'), tipsOutput = document.getElementById('budget-tips-output'); allowanceEl.textContent = `$${totalAllowance.toFixed(2)}`; remainingEl.textContent = `$${totalAllowance.toFixed(2)}`; const categories = [ { name: 'Savings', icon: '🐷', color: 'bg-green-200' }, { name: 'Fun Stuff', icon: '🎮', color: 'bg-purple-200' }, { name: 'Snacks', icon: '🍿', color: 'bg-yellow-200' }, { name: 'Giving', icon: '🎁', color: 'bg-rose-200' } ]; categoriesEl.innerHTML = ''; categories.forEach(cat => { const div = document.createElement('div'); div.className = `p-3 rounded-lg ${cat.color} flex items-center justify-between`; div.innerHTML = `<label for="${cat.name}" class="font-bold">${cat.icon} ${cat.name}</label><div class="flex items-center gap-2"><span>$</span><input type="number" id="${cat.name}" min="0" step="0.50" placeholder="0.00" class="w-24 p-1 rounded text-right"></div>`; categoriesEl.appendChild(div); }); function updateBudget() { let spent = 0; categories.forEach(cat => { spent += parseFloat(document.getElementById(cat.name).value) || 0; }); remaining = totalAllowance - spent; remainingEl.textContent = `$${remaining.toFixed(2)}`; if (remaining < 0) { remainingEl.className = 'font-bold text-2xl text-red-600'; feedbackEl.textContent = 'You\'ve gone over budget!'; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-red-600'; } else { remainingEl.className = 'font-bold text-2xl text-green-600'; feedbackEl.textContent = ''; } if (Math.abs(remaining) < 0.001) { feedbackEl.textContent = 'Perfectly balanced budget! Great job!'; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-green-600'; triggerConfetti(); } } categoriesEl.addEventListener('input', updateBudget); tipsBtn.addEventListener('click', async () => { const budget = categories.map(cat => ({ category: cat.name, amount: parseFloat(document.getElementById(cat.name).value) || 0 })); const prompt = `Here is a child's weekly budget from a $${totalAllowance} allowance: ${JSON.stringify(budget)}. Provide 2-3 simple, encouraging, and positive tips for them. Frame it as a friendly suggestion.`; tipsOutput.classList.remove('hidden'); tipsOutput.innerHTML = 'Thinking of some tips... ✨'; const tips = await callGemini(prompt); tipsOutput.innerHTML = tips; }); },
+                'budget-builder': () => { const totalAllowance = Math.floor(Math.random() * 91) + 10; let remaining = totalAllowance; const allowanceEl = document.getElementById('allowance-amount'), categoriesEl = document.getElementById('budget-categories'), remainingEl = document.getElementById('budget-remaining'), feedbackEl = document.getElementById('game-feedback'); const categories = [ { name: 'Savings', icon: '🐷', color: 'bg-green-200' }, { name: 'Fun Stuff', icon: '🎮', color: 'bg-purple-200' }, { name: 'Snacks', icon: '🍿', color: 'bg-yellow-200' }, { name: 'Giving', icon: '🎁', color: 'bg-rose-200' } ]; allowanceEl.textContent = `$${totalAllowance.toFixed(2)}`; remainingEl.textContent = `$${totalAllowance.toFixed(2)}`; categoriesEl.innerHTML = ''; categories.forEach(cat => { const div = document.createElement('div'); div.className = `p-3 rounded-lg ${cat.color} flex items-center justify-between`; div.innerHTML = `<label for="${cat.name}" class="font-bold">${cat.icon} ${cat.name}</label><div class="flex items-center gap-2"><span>$</span><input type="number" id="${cat.name}" min="0" step="0.50" placeholder="0.00" class="w-24 p-1 rounded text-right"></div>`; categoriesEl.appendChild(div); }); function updateBudget() { let spent = 0; categories.forEach(cat => { spent += parseFloat(document.getElementById(cat.name).value) || 0; }); remaining = totalAllowance - spent; remainingEl.textContent = `$${remaining.toFixed(2)}`; if (remaining < 0) { remainingEl.className = 'font-bold text-2xl text-red-600'; feedbackEl.textContent = 'You\'ve gone over budget!'; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-red-600'; } else { remainingEl.className = 'font-bold text-2xl text-green-600'; feedbackEl.textContent = ''; } if (Math.abs(remaining) < 0.001) { feedbackEl.textContent = 'Perfectly balanced budget! Great job!'; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-green-600'; triggerConfetti(); } } categoriesEl.addEventListener('input', updateBudget); },
                 'investment-growth': () => { let year = 0; let initialValue = 100.00; let value = initialValue; const yearEl = document.getElementById('invest-year'), valueEl = document.getElementById('invest-value'), riskSelector = document.getElementById('risk-level'), initialInvestmentInput = document.getElementById('initial-investment'); function reset() { year = 0; initialValue = parseFloat(initialInvestmentInput.value) || 100; value = initialValue; yearEl.textContent = year; valueEl.textContent = `$${value.toFixed(2)}`; } initialInvestmentInput.addEventListener('change', reset); document.getElementById('next-year-btn').onclick = () => { if (year === 0) { initialValue = parseFloat(initialInvestmentInput.value) || 100; value = initialValue; } year++; const growthRate = parseFloat(riskSelector.value); value *= (1 + growthRate); yearEl.textContent = year; valueEl.textContent = `$${value.toFixed(2)}`; }; document.getElementById('reset-game').onclick = reset; reset(); },
                 'smart-shopper': () => { const items = [ { name: 'Cereal', options: [{ name: 'Brand Name', price: 4.50 }, { name: 'Store Brand', price: 2.75 }] }, { name: 'Juice', options: [{ name: 'Organic', price: 5.00 }, { name: 'Regular', price: 3.50 }] }, { name: 'T-Shirt', options: [{ name: 'Designer', price: 30.00 }, { name: 'Basic', price: 12.00 }] }, { name: 'Notebook', options: [{ name: 'Fancy Cover', price: 3.00 }, { name: 'Plain', price: 1.25 }] }, { name: 'Snack Bar', options: [{ name: 'Single Bar', price: 2.00 }, { name: 'Box of 6', price: 9.00 }] }, { name: 'Water Bottle', options: [{ name: 'Insulated', price: 25.00 }, { name: 'Plastic', price: 8.00 }] } ], itemsEl = document.getElementById('shopper-items'), feedbackEl = document.getElementById('game-feedback'); function loadPair() { const pair = items[Math.floor(Math.random() * items.length)]; itemsEl.innerHTML = ''; feedbackEl.textContent = ''; const sortedOptions = [...pair.options].sort(() => Math.random() - 0.5); sortedOptions.forEach(opt => { const div = document.createElement('div'); div.className = 'shopper-item border-4 border-transparent bg-gray-100 p-4 rounded-lg text-center cursor-pointer'; div.innerHTML = `<p class="font-bold text-lg">${opt.name} ${pair.name}</p><p class="text-3xl mt-2">$${opt.price.toFixed(2)}</p>`; div.onclick = () => { const isCheaper = opt.price < pair.options.find(o => o.price !== opt.price).price; if (isCheaper) { feedbackEl.textContent = 'Great deal! You saved money!'; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-green-600'; triggerConfetti(); } else { feedbackEl.textContent = 'Good try, but there was a cheaper option!'; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-red-600'; } Array.from(itemsEl.children).forEach(child => child.onclick = null); }; itemsEl.appendChild(div); }); } document.getElementById('reset-game').onclick = loadPair; loadPair(); },
-                'paycheck-puzzle': () => { const grossPay = Math.floor(Math.random() * 301) + 200; const deductions = [ { name: 'Federal Tax', percent: 0.10 }, { name: 'State Tax', percent: 0.05 }, { name: '401(k) Savings', percent: 0.03 } ]; const grossPayEl = document.getElementById('gross-pay'), deductionsEl = document.getElementById('paycheck-deductions'), guessInput = document.getElementById('net-pay-guess'), checkBtn = document.getElementById('check-guess-btn'), feedbackEl = document.getElementById('game-feedback'), resetBtn = document.getElementById('reset-game'); grossPayEl.textContent = `$${grossPay.toFixed(2)}`; deductionsEl.innerHTML = ''; const totalDeductions = deductions.reduce((acc, d) => acc + (grossPay * d.percent), 0); const netPay = grossPay - totalDeductions; deductions.forEach(d => { const amount = grossPay * d.percent, div = document.createElement('div'); div.className = 'flex justify-between items-center text-red-600'; div.innerHTML = `<p class="text-lg">${d.name} (${d.percent * 100}%)</p><p class="font-bold text-xl">-$${amount.toFixed(2)}</p>`; deductionsEl.appendChild(div); }); checkBtn.onclick = () => { const guess = parseFloat(guessInput.value); if (isNaN(guess)) { feedbackEl.textContent = 'Please enter a number!'; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-red-600'; return; } if (Math.abs(guess - netPay) < 0.01) { feedbackEl.textContent = `Exactly right! 🎉 The net pay is $${netPay.toFixed(2)}`; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-green-600'; resetBtn.classList.remove('hidden'); triggerConfetti(); } else { feedbackEl.textContent = `Not quite! The correct amount is $${netPay.toFixed(2)}. You were off by $${Math.abs(guess - netPay).toFixed(2)}.`; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-red-600'; resetBtn.classList.remove('hidden'); } }; resetBtn.onclick = this.getGameLogic('paycheck-puzzle'); },
-                'piggy-bank': () => { let saved = 0; const goal = (Math.floor(Math.random() * 16) + 5) * 5; const savedEl = document.getElementById('piggy-saved'), goalEl = document.getElementById('piggy-goal'), fillEl = document.getElementById('piggy-fill'), feedbackEl = document.getElementById('game-feedback'); goalEl.textContent = `$${goal.toFixed(2)}`; function updateDisplay() { savedEl.textContent = `$${saved.toFixed(2)}`; const fillPercent = Math.min((saved / goal) * 100, 100); fillEl.style.height = `${fillPercent}%`; if (saved >= goal) { feedbackEl.textContent = 'You reached your goal! 🎉'; feedbackEl.className = 'text-center my-4 h-6 font-bold text-green-600'; triggerConfetti(); document.getElementById('add-1').disabled = true; document.getElementById('add-5').disabled = true; } } document.getElementById('add-1').onclick = () => { saved += 1; updateDisplay(); }; document.getElementById('add-5').onclick = () => { saved += 5; updateDisplay(); }; document.getElementById('reset-game').onclick = this.getGameLogic('piggy-bank'); updateDisplay(); },
+                'paycheck-puzzle': () => { const grossPay = Math.floor(Math.random() * 301) + 200; const deductions = [ { name: 'Federal Tax', percent: 0.10 }, { name: 'State Tax', percent: 0.05 }, { name: '401(k) Savings', percent: 0.03 } ]; const grossPayEl = document.getElementById('gross-pay'), deductionsEl = document.getElementById('paycheck-deductions'), guessInput = document.getElementById('net-pay-guess'), checkBtn = document.getElementById('check-guess-btn'), feedbackEl = document.getElementById('game-feedback'), resetBtn = document.getElementById('reset-game'); grossPayEl.textContent = `$${grossPay.toFixed(2)}`; deductionsEl.innerHTML = ''; const totalDeductions = deductions.reduce((acc, d) => acc + (grossPay * d.percent), 0); const netPay = grossPay - totalDeductions; deductions.forEach(d => { const amount = grossPay * d.percent, div = document.createElement('div'); div.className = 'flex justify-between items-center text-red-600'; div.innerHTML = `<p class="text-lg">${d.name} (${d.percent * 100}%)</p><p class="font-bold text-xl">-$${amount.toFixed(2)}</p>`; deductionsEl.appendChild(div); }); checkBtn.onclick = () => { const guess = parseFloat(guessInput.value); if (isNaN(guess)) { feedbackEl.textContent = 'Please enter a number!'; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-red-600'; return; } if (Math.abs(guess - netPay) < 0.01) { feedbackEl.textContent = `Exactly right! 🎉 The net pay is $${netPay.toFixed(2)}`; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-green-600'; resetBtn.classList.remove('hidden'); triggerConfetti(); } else { feedbackEl.textContent = `Not quite! The correct amount is $${netPay.toFixed(2)}. You were off by $${Math.abs(guess - netPay).toFixed(2)}.`; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-red-600'; resetBtn.classList.remove('hidden'); } }; resetBtn.onclick = GameLauncher.getGameLogic('paycheck-puzzle'); },
+                'piggy-bank': () => { let saved = 0; const goal = (Math.floor(Math.random() * 16) + 5) * 5; const savedEl = document.getElementById('piggy-saved'), goalEl = document.getElementById('piggy-goal'), fillEl = document.getElementById('piggy-fill'), feedbackEl = document.getElementById('game-feedback'); goalEl.textContent = `$${goal.toFixed(2)}`; function updateDisplay() { savedEl.textContent = `$${saved.toFixed(2)}`; const fillPercent = Math.min((saved / goal) * 100, 100); fillEl.style.height = `${fillPercent}%`; if (saved >= goal) { feedbackEl.textContent = 'You reached your goal! 🎉'; feedbackEl.className = 'text-center my-4 h-6 font-bold text-green-600'; triggerConfetti(); document.getElementById('add-1').disabled = true; document.getElementById('add-5').disabled = true; } } document.getElementById('add-1').onclick = () => { saved += 1; updateDisplay(); }; document.getElementById('add-5').onclick = () => { saved += 5; updateDisplay(); }; document.getElementById('reset-game').onclick = GameLauncher.getGameLogic('piggy-bank'); updateDisplay(); },
                 'cash-grab': () => { let score = 0, time = 15, timerInterval, spawnInterval; const timerEl = document.getElementById('cash-timer'), scoreEl = document.getElementById('cash-score'), areaEl = document.getElementById('cash-grab-area'), startBtn = document.getElementById('start-cash-grab'); function spawnCash() { const item = document.createElement('div'); item.className = 'cash-grab-item'; item.textContent = Math.random() < 0.7 ? '💵' : '🪙'; item.style.left = `${Math.random() * 90}%`; item.style.animationDuration = `${Math.random() * 2 + 2}s`; item.onclick = () => { score += item.textContent === '💵' ? 5 : 1; scoreEl.textContent = score; item.remove(); }; areaEl.appendChild(item); setTimeout(() => item.remove(), 4000); } function endGame() { clearInterval(timerInterval); clearInterval(spawnInterval); areaEl.innerHTML = `<p class="text-center text-2xl font-bold mt-20">Game Over! Final Score: ${score}</p>`; startBtn.textContent = 'Play Again'; startBtn.disabled = false; } function startGame() { score = 0; time = 15; scoreEl.textContent = score; timerEl.textContent = time; areaEl.innerHTML = ''; startBtn.disabled = true; timerInterval = setInterval(() => { time--; timerEl.textContent = time; if (time <= 0) endGame(); }, 1000); spawnInterval = setInterval(spawnCash, 500); } startBtn.onclick = startGame; },
                 'credit-climber': () => { const scenarios = [ { q: "You get your first credit card. What's the best way to use it?", a: [{ t: "Max it out on video games", v: -50 }, { t: "Make small purchases and pay the bill in full", v: 25 }, { t: "Never use it", v: -5 }] }, { q: "Your phone bill is due tomorrow. What do you do?", a: [{ t: "Pay it on time", v: 15 }, { t: "Pay it a week late", v: -20 }, { t: "Ignore it", v: -75 }] }, { q: "A store offers you a 10% discount to open a new store credit card. You don't need it.", a: [{ t: "Open it for the discount", v: -10 }, { t: "Politely decline", v: 10 }] } ]; let score = 650, currentScenario = 0; const scoreEl = document.getElementById('credit-score'), textEl = document.getElementById('credit-scenario-text'), choicesEl = document.getElementById('credit-choices'), feedbackEl = document.getElementById('game-feedback'); function loadScenario() { if (currentScenario >= scenarios.length) { textEl.textContent = "You've completed all the scenarios!"; choicesEl.innerHTML = ''; feedbackEl.textContent = `Final Score: ${score}! Great job!`; feedbackEl.className = 'text-center mt-4 h-6 font-bold text-green-600'; return; } const s = scenarios[currentScenario]; textEl.textContent = s.q; choicesEl.innerHTML = ''; s.a.forEach(ans => { const btn = document.createElement('button'); btn.textContent = ans.t; btn.className = 'bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600'; btn.onclick = () => { score += ans.v; scoreEl.textContent = score; feedbackEl.textContent = ans.v > 0 ? `Good choice! +${ans.v} points!` : `Oh no! ${ans.v} points.`; feedbackEl.className = `text-center mt-4 h-6 font-bold ${ans.v > 0 ? 'text-green-600' : 'text-red-600'}`; currentScenario++; setTimeout(loadScenario, 1500); }; choicesEl.appendChild(btn); }); } loadScenario(); },
             })[id],
         };
 
-        // --- EVENT BINDING ---
+        // event binding
         document.addEventListener('DOMContentLoaded', () => {
             renderStaticViews();
             showView('home-view');
 
-            // Navigation
-            document.querySelectorAll('.nav-link, #mobile-menu a').forEach(link => {
-                if (link.id.includes('about')) {
-                    link.addEventListener('click', AppEvents.handleAboutClick);
-                } else {
-                    link.addEventListener('click', AppEvents.handleNavClick);
+            // Centralized event listener for all clicks
+            document.body.addEventListener('click', (e) => {
+                const target = e.target;
+                const viewAction = target.closest('[data-view]');
+                const action = target.closest('[data-action]');
+                const levelAction = target.closest('.card[data-level]');
+                const topicAction = target.closest('.topic-card');
+                const gameAction = target.closest('.card[data-game]');
+
+                if (viewAction) {
+                    e.preventDefault();
+                    showView(viewAction.dataset.view);
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+                if (action) {
+                    e.preventDefault();
+                    if (action.dataset.action === 'about') {
+                        const content = `<div class="flex-1 text-center"><h2 class="font-display text-3xl text-orange-500 mb-4">About UTRGV Financial Adventures</h2><p class="text-gray-600 mb-4">Welcome! Our mission is to make learning about money simple, fun, and engaging for all ages.</p><p class="text-gray-600">This interactive page was built with a passion for education and technology. We hope you enjoy your journey to financial fitness!</p></div>`;
+                        showModal(content, '2xl');
+                    }
+                    if (action.dataset.action === 'close-modal') {
+                        hideModal();
+                    }
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+                if (levelAction) {
+                    displayTopics(levelAction.dataset.level);
+                }
+                if (topicAction) {
+                    AppEvents.handleTopicClick(e);
+                }
+                if (gameAction) {
+                    AppEvents.handleGameClick(e);
                 }
             });
+
             document.getElementById('mobile-menu-button').addEventListener('click', () => {
                 document.getElementById('mobile-menu').classList.toggle('hidden');
             });
-
-            // Home View Clicks
-            document.getElementById('select-elementary').addEventListener('click', () => displayTopics('elementary'));
-            document.getElementById('select-middle').addEventListener('click', () => displayTopics('middle'));
-            document.getElementById('select-high').addEventListener('click', () => displayTopics('high'));
-            document.getElementById('ask-gemini-btn').addEventListener('click', AppEvents.handleAskGemini);
-
-            // Topics View Clicks (Event Delegation)
-            Views.topics.addEventListener('click', AppEvents.handleTopicClick);
-
-            // Games View Clicks (Event Delegation)
-            Views.games.addEventListener('click', AppEvents.handleGameClick);
-
-            // Modal Clicks
-            Modal.closeBtn.addEventListener('click', hideModal);
+            
             Modal.backdrop.addEventListener('click', hideModal);
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && Modal.el.classList.contains('modal-visible')) hideModal(); });
         });
