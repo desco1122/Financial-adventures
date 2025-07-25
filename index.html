@@ -79,6 +79,8 @@
                     <a href="#" data-view="photos" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Photos</a>
                     <a href="#" data-view="resources" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Resources</a>
                     <a href="#" data-action="about" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
+                    <a href="#" data-action="login" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                    <a href="#" data-action="register" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Register</a>
                 </div>
                 <div class="md:hidden">
                     <button id="mobile-menu-button" class="text-gray-600 focus:outline-none"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg></button>
@@ -203,7 +205,7 @@
             showView('topics-view');
         };
 
-        // event handlers
+        // event handlers and login/register
         const AppEvents = {
             handleNavClick: (e) => {
                 e.preventDefault();
@@ -211,6 +213,43 @@
                 if (view) showView(view);
                 document.getElementById('mobile-menu').classList.add('hidden');
             },
+            handleAuthClick: (e) => {
+        e.preventDefault();
+        const action = e.target.closest('[data-action]').dataset.action;
+        let content;
+        if (action === 'login') {
+            content = `
+                <h2 class="font-display text-3xl text-center text-orange-500 mb-4">Login</h2>
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="login-username" class="block text-gray-700">Username</label>
+                        <input type="text" id="login-username" class="w-full p-2 border rounded">
+                    </div>
+                    <div class="mb-4">
+                        <label for="login-password" class="block text-gray-700">Password</label>
+                        <input type="password" id="login-password" class="w-full p-2 border rounded">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">Login</button>
+                </form>
+            `;
+        } else { // register
+            content = `
+                <h2 class="font-display text-3xl text-center text-orange-500 mb-4">Register</h2>
+                <form id="register-form">
+                    <div class="mb-4">
+                        <label for="register-username" class="block text-gray-700">Username</label>
+                        <input type="text" id="register-username" class="w-full p-2 border rounded">
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-password" class="block text-gray-700">Password</label>
+                        <input type="password" id="register-password" class="w-full p-2 border rounded">
+                    </div>
+                    <button type="submit" class="w-full bg-green-500 text-white p-2 rounded">Register</button>
+                </form>
+            `;
+        }
+        showModal(content, 'md');
+    },
             handleAboutClick: (e) => {
                 e.preventDefault();
                 const content = `<div class="flex-1 text-center"><h2 class="font-display text-3xl text-orange-500 mb-4">About UTRGV Financial Adventures</h2><p class="text-gray-600 mb-4">Welcome! Our mission is to make learning about money simple, fun, and engaging for all ages.</p><p class="text-gray-600">This interactive page was built with a passion for education and technology. We hope you enjoy your journey to financial fitness!</p></div>`;
@@ -298,6 +337,9 @@
                     if (action.dataset.action === 'close-modal') {
                         hideModal();
                     }
+                    if (action.dataset.action === 'login' || action.dataset.action === 'register') {
+                         AppEvents.handleAuthClick(e);
+                    }
                     document.getElementById('mobile-menu').classList.add('hidden');
                 }
                 if (levelAction) {
@@ -309,6 +351,7 @@
                 if (gameAction) {
                     AppEvents.handleGameClick(e);
                 }
+                
             });
 
             document.getElementById('mobile-menu-button').addEventListener('click', () => {
@@ -318,6 +361,59 @@
             Modal.backdrop.addEventListener('click', hideModal);
             document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && Modal.el.classList.contains('modal-visible')) hideModal(); });
         });
+
+        Modal.el.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target; // This is the form element that was submitted
+
+    // A better way to get the inputs: search within the form itself
+    const usernameInput = form.querySelector('input[type="text"]');
+    const passwordInput = form.querySelector('input[type="password"]');
+
+    // Check if the inputs were found before trying to get their value
+    if (!usernameInput || !passwordInput) {
+        console.error("Could not find username or password field in the form.");
+        alert("A client-side error occurred. Could not find form fields.");
+        return;
+    }
+
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    
+    const endpoint = form.id.replace('-form', ''); // 'login' or 'register'
+
+    try {
+        const response = await fetch(`http://localhost:5000/api/auth/${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            if (endpoint === 'login') {
+                localStorage.setItem('token', data.token);
+                alert('Login successful!');
+            } else {
+                alert('Registration successful! Please log in.');
+            }
+            hideModal();
+        } else {
+            alert(data.msg);
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        alert('An error occurred during submission.');
+    }
+});
+          
+            document.getElementById('mobile-menu-button').addEventListener('click', () => { // This is the existing code on line 366
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+
     </script>
 </body>
 </html>
